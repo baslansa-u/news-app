@@ -1,0 +1,80 @@
+
+# ======================
+# Flutter (Front-end)
+# ======================
+front-end/.dart_tool/
+front-end/.flutter-plugins
+front-end/.flutter-plugins-dependencies
+front-end/build/
+front-end/.packages
+front-end/.pub-cache/
+front-end/.idea/
+front-end/*.iml
+front-end/.fvm/
+
+# ======================
+# Go (Back-end)
+# ======================
+back-end/bin/
+back-end/vendor/
+back-end/*.exe
+back-end/*.out
+back-end/*.so
+back-end/*.dll
+
+# ======================
+# Environment files
+# ======================
+.env
+.env.*
+.env.local
+.env.*.local
+config.yaml
+config.json
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ======================
+# IDE
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ======================
+# Logs & Temp
+# ======================
+*.log
+*.log.*
+*.tmp
+
+# ======================
+# Build & Dependencies
+# ======================
+*.o
+*.a
+*.so
+
+# ======================
+# Testing & Coverage
+# ======================
+coverage/
+*.prof
+
+# ======================
+# K6 Load Testing
+# ======================
+k6_tests/results/
+k6_tests/*.json
+k6_tests/

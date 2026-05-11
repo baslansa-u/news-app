@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/core/constants/app_constants.dart';
 import 'package:news_app/config/routes/routes.dart';
 import 'package:news_app/daily_news/domain/entities/article.dart';
 import 'package:news_app/daily_news/presentation/bloc/remote/article_bloc.dart';
 import 'package:news_app/daily_news/presentation/bloc/remote/article_event.dart';
 import 'package:news_app/daily_news/presentation/bloc/remote/article_state.dart';
 import 'package:news_app/daily_news/presentation/widgets/article_tile.dart';
+import 'package:news_app/daily_news/presentation/widgets/theme_switch.dart';
 
 class DailyNews extends StatelessWidget {
   const DailyNews({super.key});
@@ -16,16 +16,15 @@ class DailyNews extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: _buildBody(),
-      backgroundColor: AppConstants.backgroundColor,
     );
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text('Daily News'),
-      backgroundColor: AppConstants.surfaceColor,
       elevation: 0,
       actions: [
+        const ThemeSwitch(),
         IconButton(
           icon: const Icon(Icons.bookmark_outline),
           onPressed: () => _onShowSavedArticles(context),
@@ -36,56 +35,81 @@ class DailyNews extends StatelessWidget {
 
   Widget _buildBody() {
     return BlocBuilder<ArticlesBloc, ArticleState>(
+      buildWhen: (previous, current) {
+        return current is ArticlesLoading ||
+            current is ArticlesDone ||
+            current is ArticlesError;
+      },
       builder: (context, state) {
         if (state is ArticlesLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         }
-        if (state is ArticlesError) {
-          return _buildErrorState(context);
-        }
-        if (state is ArticlesDone) {
-          return _buildArticles(context, state.articles);
-        }
-        return const SizedBox();
-      },
-    );
-  }
 
-  Widget _buildErrorState(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        context.read<ArticlesBloc>().add(GetArticles());
-      },
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height - kToolbarHeight,
-          child: Center(
+        if (state is ArticlesError) {
+          return Center(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.error_outline,
-                    size: 64, color: AppConstants.errorColor),
-                SizedBox(height: AppConstants.paddingLarge),
-                Text('Failed to load articles'),
-                SizedBox(height: AppConstants.paddingSmall),
-                Text('Pull down to retry'),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Failed to load articles',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    context.read<ArticlesBloc>().add(GetArticles());
+                  },
+                  child: const Text('Retry'),
+                ),
               ],
             ),
-          ),
-        ),
-      ),
+          );
+        }
+
+        if (state is ArticlesDone) {
+          _prefetchImages(
+            context,
+            state.articles,
+          );
+
+          return _buildArticles(
+            context,
+            state.articles,
+          );
+        }
+
+        return const SizedBox.shrink();
+      },
     );
   }
 
-  Widget _buildArticles(BuildContext context, List<ArticleEntity> articles) {
+  Widget _buildArticles(
+    BuildContext context,
+    List<ArticleEntity> articles,
+  ) {
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: AppConstants.paddingXLarge),
+      physics: const AlwaysScrollableScrollPhysics(),
+      cacheExtent: 1000,
       itemCount: articles.length,
       itemBuilder: (context, index) {
+        final article = articles[index];
+
         return ArticleWidget(
-          article: articles[index],
-          onArticlePressed: (article) => _onArticlePressed(context, article),
+          key: ValueKey(article.urlToImage),
+          article: article,
+          onArticlePressed: (article) {
+            _onArticlePressed(
+              context,
+              article,
+            );
+          },
         );
       },
     );
@@ -97,5 +121,24 @@ class DailyNews extends StatelessWidget {
 
   void _onShowSavedArticles(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.savedArticles);
+  }
+
+  // โหลด image ก่อน user เห็น
+  void _prefetchImages(
+    BuildContext context,
+    List<ArticleEntity> articles,
+  ) {
+    final prefetchItems = articles.take(12);
+
+    for (final article in prefetchItems) {
+      final imageUrl = article.urlToImage;
+
+      if (imageUrl != null && imageUrl.isNotEmpty) {
+        precacheImage(
+          NetworkImage(imageUrl),
+          context,
+        );
+      }
+    }
   }
 }

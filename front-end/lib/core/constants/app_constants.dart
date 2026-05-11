@@ -21,18 +21,7 @@ class AppConstants {
   static const double fontSizeXLarge = 20.0;
   static const double fontSizeXXLarge = 24.0;
 
-  // Article card
-  static const double articleTileHeight = 2.2;
-  static const int titleMaxLines = 3;
-  static const int descriptionMaxLines = 2;
-
-  // Colors
-  static const Color backgroundColor = Color(0xFFFAFAFA);
-  static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFF1C1C1E);
-  static const Color textSecondary = Color(0xFF6D6D72);
-  static const Color textTertiary = Color(0xFFAEAEB2);
-  static const Color borderColor = Color(0xFFE5E5EA);
+  // Accent / Error
   static const Color accentColor = Color(0xFFE82222);
   static const Color errorColor = Color(0xFFEA4C4C);
 }

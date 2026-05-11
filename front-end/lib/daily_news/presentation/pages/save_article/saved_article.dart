@@ -20,7 +20,6 @@ class SavedArticlesView extends HookWidget {
       child: Scaffold(
         appBar: _buildAppBar(context),
         body: _buildBody(context),
-        backgroundColor: AppConstants.backgroundColor,
       ),
     );
   }
@@ -28,7 +27,6 @@ class SavedArticlesView extends HookWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       title: const Text('Saved Articles'),
-      backgroundColor: AppConstants.surfaceColor,
       elevation: 0,
     );
   }

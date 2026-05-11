@@ -20,15 +20,18 @@ class ArticleImageWidget extends StatelessWidget {
         height: 120,
         fit: BoxFit.cover,
         memCacheWidth: 300,
-        placeholder: (_, __) => Container(
-          color: AppConstants.borderColor,
+        placeholder: (context, __) => Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
           alignment: Alignment.center,
           child: const CircularProgressIndicator(strokeWidth: 2),
         ),
-        errorWidget: (_, __, ___) => Container(
-          color: AppConstants.borderColor,
+        errorWidget: (context, __, ___) => Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
           alignment: Alignment.center,
-          child: const Icon(Icons.broken_image_outlined),
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: Theme.of(context).textTheme.labelSmall?.color,
+          ),
         ),
       ),
     );

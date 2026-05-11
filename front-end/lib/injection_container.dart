@@ -6,6 +6,7 @@ import 'package:news_app/daily_news/data/repositories/article_repository_impl.da
 import 'package:news_app/daily_news/domain/repositories/article_repository.dart';
 import 'package:news_app/daily_news/domain/usecases/get_articles.dart';
 import 'package:news_app/daily_news/presentation/bloc/local/local_article_bloc.dart';
+import 'package:news_app/daily_news/presentation/bloc/local/theme_bloc.dart';
 import 'package:news_app/daily_news/presentation/bloc/remote/article_bloc.dart';
 
 import 'daily_news/domain/usecases/get_save_article.dart';
@@ -25,7 +26,10 @@ Future<void> initiallizeDependencies() async {
   // Dependencies
   sl.registerSingleton<NewsApiService>(NewsApiService(sl()));
 
-  sl.registerSingleton<ArticleRepository>(ArticleRepositoryImpl(sl(), sl()));
+  sl.registerSingleton<ArticleRepository>(ArticleRepositoryImpl(
+    sl(),
+    sl(),
+  ));
 
   // UseCases
   sl.registerSingleton<GetArticlesUsecase>(GetArticlesUsecase(sl()));
@@ -35,8 +39,12 @@ Future<void> initiallizeDependencies() async {
 
   // Bloc
   sl.registerFactory<ArticlesBloc>(() => ArticlesBloc(sl()));
-
   sl.registerFactory<LocalArticleBloc>(
-    () => LocalArticleBloc(sl(), sl(), sl()),
+    () => LocalArticleBloc(
+      sl(),
+      sl(),
+      sl(),
+    ),
   );
+  sl.registerSingleton<ThemeBloc>(ThemeBloc());
 }

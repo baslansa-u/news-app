@@ -30,7 +30,10 @@ dependencies:
   flutter_hooks: ^0.20.0
 
   cached_network_image: ^3.4.1
+
   sqflite: ^2.4.1
+
+  shared_preferences: 2.3.0
 
 dev_dependencies:
   flutter_test:

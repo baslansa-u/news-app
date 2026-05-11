@@ -13,11 +13,29 @@ class ArticlesLoading extends ArticleState {}
 
 class ArticlesDone extends ArticleState {
   final List<ArticleEntity> articles;
+  final bool isLoadingMore;
+  final bool hasReachedMax;
 
-  const ArticlesDone(this.articles);
+  const ArticlesDone(
+    this.articles, {
+    this.isLoadingMore = false,
+    this.hasReachedMax = false,
+  });
+
+  ArticlesDone copyWith({
+    List<ArticleEntity>? articles,
+    bool? isLoadingMore,
+    bool? hasReachedMax,
+  }) {
+    return ArticlesDone(
+      articles ?? this.articles,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 
   @override
-  List<Object?> get props => [articles];
+  List<Object?> get props => [articles, isLoadingMore, hasReachedMax];
 }
 
 class ArticlesError extends ArticleState {

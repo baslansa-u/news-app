@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/config/routes/routes.dart';
@@ -8,8 +9,43 @@ import 'package:news_app/daily_news/presentation/bloc/remote/article_state.dart'
 import 'package:news_app/daily_news/presentation/widgets/article_tile.dart';
 import 'package:news_app/daily_news/presentation/widgets/theme_switch.dart';
 
-class DailyNews extends StatelessWidget {
+class DailyNews extends StatefulWidget {
   const DailyNews({super.key});
+
+  @override
+  State<DailyNews> createState() => _DailyNewsState();
+}
+
+class _DailyNewsState extends State<DailyNews> {
+  final ScrollController _controller = ScrollController();
+  Timer? _scrollDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    // trigger load more ตอน scroll ใกล้ bottom
+    _controller.addListener(() {
+      if (_controller.position.pixels >=
+          _controller.position.maxScrollExtent - 200) {
+        // debounce กันยิงซ้ำ
+        if (_scrollDebounce?.isActive ?? false) return;
+
+        _scrollDebounce = Timer(
+          const Duration(milliseconds: 300),
+          () {
+            context.read<ArticlesBloc>().add(LoadMoreArticles());
+          },
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollDebounce?.cancel();
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +118,7 @@ class DailyNews extends StatelessWidget {
           return _buildArticles(
             context,
             state.articles,
+            state.isLoadingMore,
           );
         }
 
@@ -91,24 +128,28 @@ class DailyNews extends StatelessWidget {
   }
 
   Widget _buildArticles(
-    BuildContext context,
-    List<ArticleEntity> articles,
-  ) {
+      BuildContext context, List<ArticleEntity> articles, bool isLoadingMore) {
     return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
+      controller: _controller,
+      physics: const ClampingScrollPhysics(),
       cacheExtent: 1000,
-      itemCount: articles.length,
+      itemCount: articles.length + (isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        // loader footer
+        if (index >= articles.length) {
+          return const Padding(
+            padding: EdgeInsets.all(16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
         final article = articles[index];
 
         return ArticleWidget(
           key: ValueKey(article.urlToImage),
           article: article,
           onArticlePressed: (article) {
-            _onArticlePressed(
-              context,
-              article,
-            );
+            _onArticlePressed(context, article);
           },
         );
       },

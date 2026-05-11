@@ -10,7 +10,19 @@ class ArticleImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = article?.urlToImage ?? '';
+    final imageUrl = article?.urlToImage;
+
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return Container(
+        width: 100,
+        height: 120,
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: Icon(
+          Icons.broken_image_outlined,
+          color: Theme.of(context).textTheme.labelSmall?.color,
+        ),
+      );
+    }
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppConstants.radiusLarge),
@@ -19,15 +31,13 @@ class ArticleImageWidget extends StatelessWidget {
         width: 100,
         height: 120,
         fit: BoxFit.cover,
-        memCacheWidth: 300,
+        memCacheWidth: 200,
+        fadeInDuration: const Duration(milliseconds: 150),
         placeholder: (context, __) => Container(
           color: Theme.of(context).scaffoldBackgroundColor,
-          alignment: Alignment.center,
-          child: const CircularProgressIndicator(strokeWidth: 2),
         ),
         errorWidget: (context, __, ___) => Container(
           color: Theme.of(context).scaffoldBackgroundColor,
-          alignment: Alignment.center,
           child: Icon(
             Icons.broken_image_outlined,
             color: Theme.of(context).textTheme.labelSmall?.color,

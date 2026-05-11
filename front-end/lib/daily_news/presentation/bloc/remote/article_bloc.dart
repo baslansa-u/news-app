@@ -40,6 +40,8 @@ class ArticlesBloc extends Bloc<ArticleEvent, ArticleState> {
     if (currentState.isLoadingMore) return;
     if (currentState.hasReachedMax) return;
 
+    emit(currentState.copyWith(isLoadingMore: true));
+
     final currentLength = currentState.articles.length;
 
     final nextItems = _allArticles.skip(currentLength).take(_pageSize).toList();
